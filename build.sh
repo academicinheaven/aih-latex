@@ -34,8 +34,8 @@ build ()
   echo Micromamba: "$MICROMAMBA_VERSION"
   echo Parameters: "$PARAMETERS"
   echo Environment file: "$ENVIRONMENT_FILE"
-  # Copy files to build context
-  cp -r ../git_submodules/dockerfiles/common .
+  # Copy files from submodule to build context
+  cp -r dockerfiles/common .
   docker build $PARAMETERS \
   --build-arg="MICROMAMBA_VERSION=$MICROMAMBA_VERSION" \
   --progress=plain --tag "$USERNAME/$IMAGE_NAME:$IMAGE_TAG" .
@@ -57,12 +57,14 @@ update ()
    echo
    echo "Note: env.yaml.lock will not be overwritten (use ./build.sh freeze for this)" 
    # Update git submodules
+   echo Updating git submodules
+   # TBD: This should maybe not take place on the main branch???
    git submodule update --init --recursive
-   cd ../git_submodules/dockerfiles
+   cd dockerfiles
    git fetch
    git checkout main  # Replace 'main' with the branch you are tracking
    git pull           # Pull the latest changes
-   cd ../../aih-texlive
+   cd ..
    # staging / commit / push will be up to the developer   
    # Update Seccomp profile
    echo Fetching the latest seccomp profile from https://github.com/moby/moby/blob/master/profiles/seccomp/default.json
