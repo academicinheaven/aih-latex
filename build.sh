@@ -7,9 +7,10 @@ USERNAME=$USER
 DOCKER_HUB_USERNAME="mfhepp"
 SOURCEFILE="versions.txt"
 PARAMETERS=""
+# PARAMETERS="--no-cache"
 # We only build for Apple M1 for the moment
 PLATFORM="linux/arm64"
-ENVIRONMENT_FILE="env.yaml.lock"
+ENVIRONMENT_FILE="env.yaml"
 
 usage ()
 {
@@ -53,6 +54,7 @@ build ()
    --build-arg PLATFORM=${PLATFORM} \
    --build-arg BUILDPLATFORM=${PLATFORM} \
    --build-arg MICROMAMBA_VERSION=${MICROMAMBA_VERSION} \
+   --build-arg ENVIRONMENT_FILE=${ENVIRONMENT_FILE} \
    --progress=plain --tag ${USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} .
    if [[ $? -ne 0 ]]; then
       echo "ERROR: Docker build failed."
@@ -68,12 +70,13 @@ build ()
 
 run_tests () {
    # IMAGE_TAG="dev"
-   NETWORK="--net=none"
+   # Tectonic needs outbound internet!
+   # NETWORK="--net=none"
    # Use this if tests require network connection:
-   # NETWORK="--net=host"
+   NETWORK="--net=host"
    # TODO: Check if read-only filesystem can be made working
-   # READ_ONLY=""
-   READ_ONLY="--read-only --tmpfs /tmp"   
+   READ_ONLY=""
+   # READ_ONLY="--read-only --tmpfs /tmp"   
    echo Running tests against the local image "$USERNAME/$IMAGE_NAME:$IMAGE_TAG"
    docker run \
     --security-opt seccomp=seccomp-default.json \
