@@ -1,6 +1,6 @@
 # Dockerfile for TexLive and Tectonic installation
 # based on https://github.com/pandoc/dockerfiles
-
+ARG BUILDPLATFORM
 ARG MICROMAMBA_VERSION=latest
 ARG ENVIRONMENT_FILE=env.yaml.lock
 ARG BASE_IMAGE=mambaorg/micromamba
@@ -12,7 +12,7 @@ ARG texlive_version=
 ARG texlive_mirror_url=
 
 # Stage 1: Patched version of Micromamba / Debian
-FROM ${BASE_IMAGE}:${MICROMAMBA_VERSION} as micromamba_patched
+FROM --platform=${BUILDPLATFORM} ${BASE_IMAGE}:${MICROMAMBA_VERSION} as micromamba_patched
 ARG MICROMAMBA_VERSION
 ARG ENVIRONMENT_FILE
 # Install security updates if base image is not yet patched
@@ -34,9 +34,11 @@ ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
 # But we can install from conda-forge
 # https://github.com/conda-forge/tectonic-feedstock
 FROM micromamba_patched as aih_tectonic
+ARG ENVIRONMENT_FILE
 # WORKDIR /usr/aih/
 USER $MAMBA_USER
-COPY --chown=$MAMBA_USER:$MAMBA_USER $ENVIRONMENT_FILE /tmp/env.yaml
+RUN echo --chown=${MAMBA_USER}:${MAMBA_USER} ${ENVIRONMENT_FILE}
+COPY --chown=${MAMBA_USER}:${MAMBA_USER} ${ENVIRONMENT_FILE} /tmp/env.yaml
 # Install packages
 # 'tectonic' must be listed in env.yaml
 RUN micromamba install -y -n base -f /tmp/env.yaml && \
@@ -83,9 +85,9 @@ RUN TEXLIVE_ARCH="$(uname -m)-$(uname -s | tr '[:upper:]' '[:lower:]')" && \
 # Modify PATH environment variable, prepending TexLive bin directory
 ENV PATH="${texlive_bin}/default:${PATH}"
 WORKDIR /root
-COPY ./common/latex/texlive.profile /root/texlive.profile
-COPY ./common/latex/install-texlive.sh /root/install-texlive.sh
-COPY ./common/latex/packages.txt /root/packages.txt
+COPY dockerfiles/common/latex/texlive.profile /root/texlive.profile
+COPY dockerfiles/common/latex/install-texlive.sh /root/install-texlive.sh
+COPY dockerfiles/common/latex/packages.txt /root/packages.txt
 # TeXLive version to install (leave empty to use the latest version).
 ARG texlive_version=
 # TeXLive mirror URL (leave empty to use the default mirror).
@@ -101,7 +103,7 @@ RUN ( [ -z "$texlive_version"    ] || printf '-t\n%s\n"' "$texlive_version" \
   && TERM=dumb luaotfload-tool --update \
   && chmod -R o+w /opt/texlive/texdir/texmf-var
 # We directly install the TeX packages from pandoc-extra
-COPY ./common/extra/packages.txt /root/extra_packages.txt
+COPY dockerfiles/common/extra/packages.txt /root/extra_packages.txt
 RUN sed -e 's/ *#.*$//' -e '/^ *$/d' /root/extra_packages.txt | \
    xargs tlmgr install \
    && rm -f /root/extra_packages.txt
