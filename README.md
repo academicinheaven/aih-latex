@@ -86,8 +86,8 @@ docker run --rm -it --mount type=bind,source="$(pwd)",target=/usr/aih/data/src \
 10. Currently manually: Attach the `latest` tag to the latest version
 ```bash
 docker login
-docker pull mfhepp/aih-latex:2014-0.15.0
-docker tag mfhepp/aih-latex:2014-0.15.0 mfhepp/aih-latex:latest
+docker pull mfhepp/aih-latex:2024-0.15.0
+docker tag mfhepp/aih-latex:2024-0.15.0 mfhepp/aih-latex:latest
 docker push mfhepp/aih-latex:latest
 ```
 
