@@ -103,9 +103,9 @@ docker push mfhepp/aih-latex:latest
 The version numbering for `aih-latex` is based on the combination of  **the  TeX Live version** and the `tectonic` release tag. `latest` is the latest available version.
 
 | Tag / Release | TeX Live version | Tectonic version | micromamba-docker  version | Image tag on Docker Hub |
-| --- | --- | --- |
+| --- | --- | --- |--- |--- |
 | latest | 2024 | 0.15.0 | 1.5.8 | [mfhepp/aih-latex:latest](https://hub.docker.com/repository/docker/mfhepp/aih-latex/general) |
-| 2024-0.15.0 | 2024 | 0.15.0 | 1.5.8 | [mfhepp/aih-latex:latest](https://hub.docker.com/repository/docker/mfhepp/aih-latex/general) |
+| 2024-0.15.0 | 2024 | 0.15.0 | 1.5.8 | [mfhepp/aih-latex:2024-0.15.0](https://hub.docker.com/repository/docker/mfhepp/aih-latex/general) |
 
 The versions for `latest` are stored in [`versions.txt`](versions.txt). The versions for each previous release will be in in `freeze/<version>/versions.txt`.
 
